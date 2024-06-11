@@ -1,0 +1,17 @@
+.my-nav{
+    background-color: aliceblue;
+}
+
+.my-nav > .my-heading{
+    color: #5f0099;
+}
+
+.my-nav > .button-div >.my-button{
+    background-color: #5f0099;
+}
+
+.my-report{
+    /* background-color: rgb(255, 255, 255); */
+    margin-top: 1px;
+    height: 100%;
+}
