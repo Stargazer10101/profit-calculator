@@ -4,33 +4,29 @@ import { useState, useEffect } from 'react';
 
 export default function Report() {
     const [formData, setFormData] = useState({
-        labourWages: 0,
-        electricity: 0,
-        rent: 0,
-        waterBill: 0,
-        petrol: 0,
-        diesel: 0,
-        medicine: 0,
-        food: 0,
-        chickDepreciation: 0,
-        interest: 0,
-        parts: 0,
+        labourWages: '',
+        electricity: '',
+        rent: '',
+        waterBill: '',
+        petrol: '',
+        diesel: '',
+        medicine: '',
+        food: '',
+        chickDepreciation: '',
+        interest: '',
+        parts: '',
     });
 
     const [expense, setExpense] = useState({
         totalDailyExpense: 0,
         totalMonthlyExpense: 0
-    })
+    });
 
-    const [numOfEggs, setNumOfEggs] = useState(0);
-    const [pricePer100Eggs, setPricePer100Eggs] = useState(0);
+    const [numOfEggs, setNumOfEggs] = useState('');
+    const [pricePer100Eggs, setPricePer100Eggs] = useState('');
     const [perEggTotalDailyExpense, setPerEggTotalDailyExpense] = useState(0);
     const [perEggTotalDailyProfit, setPerEggTotalDailyProfit] = useState(0);
     const [perEggSellingPrice, setPerEggSellingPrice] = useState(0);
-
-
-
-
 
     useEffect(() => {
         // Calculate total monthly expenses
@@ -38,54 +34,61 @@ export default function Report() {
             const monthlyExpenses = ['labourWages', 'electricity', 'rent', 'waterBill', 'petrol', 'diesel'];
             const dailyExpenses = ['medicine', 'food', 'chickDepreciation', 'interest'];
             const miscExpenses = ['parts'];
+
             const miscMonthlyExpenses = (miscExpenses.reduce((acc, expense) => acc + parseFloat(formData[expense] || 0), 0) / (365 * 1.5)) * 30;
             let totalDailyExpense = (dailyExpenses.reduce((acc, expense) => acc + parseFloat(formData[expense] || 0), 0) * 30);
             totalDailyExpense = isNaN(totalDailyExpense) ? 0 : totalDailyExpense.toFixed(2);
             let totalMonthlyExpense = monthlyExpenses.reduce((acc, expense) => acc + parseFloat(formData[expense] || 0), 0) + parseFloat(totalDailyExpense) + parseFloat(miscMonthlyExpenses);
-            totalMonthlyExpense = totalMonthlyExpense.toFixed(2)
+            totalMonthlyExpense = totalMonthlyExpense.toFixed(2);
             setExpense(prevData => ({ ...prevData, totalMonthlyExpense }));
         };
 
-        // Calculate total daily expenses and multiply by 30
+        calculateMonthlyExpense();
+    }, [formData]);
+
+    useEffect(() => {
+        // Calculate total daily expenses
         const calculateDailyExpense = () => {
             const dailyExpenses = ['medicine', 'food', 'chickDepreciation', 'interest'];
-            // const totalDailyExpense = (dailyExpenses.reduce((acc, expense) => acc + parseFloat(formData[expense] || 0), 0) * 30);
             const monthlyExpenses = ['labourWages', 'electricity', 'rent', 'waterBill', 'petrol', 'diesel'];
             const miscExpenses = ['parts'];
+
             const miscMonthlyExpenses = (miscExpenses.reduce((acc, expense) => acc + parseFloat(formData[expense] || 0), 0) / (365 * 1.5));
             const totalMonthlyDailyExpense = monthlyExpenses.reduce((acc, expense) => acc + parseFloat(formData[expense] || 0), 0) / 30;
             let totalDailyExpense = (dailyExpenses.reduce((acc, expense) => acc + parseFloat(formData[expense] || 0), 0)) + parseFloat(totalMonthlyDailyExpense) + parseFloat(miscMonthlyExpenses);
-            totalDailyExpense = totalDailyExpense.toFixed(2)
+            totalDailyExpense = totalDailyExpense.toFixed(2);
             setExpense(prevData => ({ ...prevData, totalDailyExpense }));
         };
 
+        calculateDailyExpense();
+    }, [formData]);
+
+    useEffect(() => {
         const handleCalculate = () => {
             if (numOfEggs && pricePer100Eggs) {
                 calculateTotalExpense();
             }
         };
 
-        const calculateTotalExpense = () => {
-            // calculate per egg selling cost
-            const numOfSets = Math.ceil(numOfEggs / 100); // Calculate number of sets of 100 eggs
-            let totalSellingPrice = parseFloat(numOfSets) * parseFloat(pricePer100Eggs); // Calculate total price
-            totalSellingPrice = totalSellingPrice.toFixed(2)
-            setPerEggSellingPrice(totalSellingPrice);
-
-            // calculate per egg production cost
-
-            let productionCost = expense['totalDailyExpense'];
-            setPerEggTotalDailyExpense(productionCost);
-
-            // calculate per egg profit
-            let profit = parseFloat(totalSellingPrice) - parseFloat(productionCost);
-            profit = profit.toFixed(2)
-            setPerEggTotalDailyProfit(profit);
-        };
-        calculateMonthlyExpense();
-        calculateDailyExpense();
         handleCalculate();
-    }, [expense, pricePer100Eggs, formData, numOfEggs, perEggTotalDailyExpense, perEggTotalDailyProfit, perEggSellingPrice]);
+    }, [numOfEggs, pricePer100Eggs, expense]);
+
+    const calculateTotalExpense = () => {
+        // calculate per egg selling cost
+        const numOfSets = Math.ceil(numOfEggs / 100); // Calculate number of sets of 100 eggs
+        let totalSellingPrice = parseFloat(numOfSets) * parseFloat(pricePer100Eggs); // Calculate total price
+        totalSellingPrice = totalSellingPrice.toFixed(2);
+        setPerEggSellingPrice(totalSellingPrice);
+
+        // calculate per egg production cost
+        let productionCost = expense['totalDailyExpense'];
+        setPerEggTotalDailyExpense(productionCost);
+
+        // calculate per egg profit
+        let profit = parseFloat(totalSellingPrice) - parseFloat(productionCost);
+        profit = profit.toFixed(2);
+        setPerEggTotalDailyProfit(profit);
+    };
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -94,9 +97,9 @@ export default function Report() {
 
     const handleSubmit = (e) => {
         e.preventDefault();
+        // Assuming onSubmit is defined somewhere
         onSubmit(formData);
     };
-
 
     return (
         <div className="my-report p-4">
@@ -104,7 +107,7 @@ export default function Report() {
                 <div className="w-full md:w-1/2 lg:w-1/3 p-4">
                     <div className="mb-3">
                         <h2 className="text-lg font-semibold mb-2">Report Name</h2>
-                        <input type="text" id="email" placeholder="Enter name" className="mt-2 w-full flex h-12 items-center justify-center rounded-sm border bg-white p-3 text-sm outline-none border-gray-200" />
+                        <input type="text" id="reportName" placeholder="Enter name" className="mt-2 w-full flex h-12 items-center justify-center rounded-sm border bg-white p-3 text-sm outline-none border-gray-200" />
                     </div>
                 </div>
                 <div className="flex flex-wrap justify-center lg:justify-between items-center">
@@ -224,9 +227,9 @@ export default function Report() {
                                         <li>Total per egg daily expense: {perEggTotalDailyExpense} ₹</li>
                                         <li className="text-red-500">Total egg daily profit: {perEggTotalDailyProfit} ₹</li>
                                         <hr></hr>
-                                        <li>Per egg daily selling price: {perEggSellingPrice / numOfEggs} ₹</li>
-                                        <li>Per egg daily expense: {perEggTotalDailyExpense / numOfEggs} ₹</li>
-                                        <li className="text-red-500">Per egg daily profit: {perEggTotalDailyProfit && numOfEggs ? perEggTotalDailyProfit / numOfEggs : ''} ₹</li>
+                                        <li>Per egg daily selling price: {perEggSellingPrice / (numOfEggs || 1)} ₹</li>
+                                        <li>Per egg daily expense: {perEggTotalDailyExpense / (numOfEggs || 1)} ₹</li>
+                                        <li className="text-red-500">Per egg daily profit: {perEggTotalDailyProfit && numOfEggs ? perEggTotalDailyProfit / (numOfEggs || 1) : ''} ₹</li>
                                         <hr></hr>
                                     </div>
                                 )}
@@ -235,7 +238,6 @@ export default function Report() {
                     </div>
                 </div>
             </form>
-
         </div>
     );
 }

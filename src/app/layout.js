@@ -11,7 +11,15 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
-      <body className={inter.className}>{children}</body>
+      <body className={inter.className}>
+        <header className="header">
+          <h1>Profit-Calculator</h1>
+        </header>
+        <main className="main-content">{children}</main>
+        <footer className="footer">
+          <p>&copy; {new Date().getFullYear()} My App. All rights reserved.</p>
+        </footer>
+      </body>
     </html>
   );
 }
